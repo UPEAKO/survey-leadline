@@ -41,6 +41,10 @@ public class Tool {
     private int errorByPlusAngle = 0;
     //导线全场闭合差
     private double errorForLength = 0.0;
+    //deltaX和deltaY
+    private double deltaXForAll = 0.0,deltaYForAll = 0.0;
+    //圈数
+    int numForcircle = 0;
 
     public Tool(String fileName) {
         this.fileName = fileName;
@@ -102,6 +106,7 @@ public class Tool {
                 double y1 = Double.valueOf(twoCoorForAngle0[1]);
                 double x2 = Double.valueOf(twoCoorForAngle0[2]);
                 double y2 = Double.valueOf(twoCoorForAngle0[3]);
+                numForcircle = Integer.valueOf(twoCoorForAngle0[4]);
                 //Math.atan()在正负PI/2之间
                 double angle_double = Math.atan((y2 - y1)/(x2 - x1));
                 if (angle_double > 0) {
@@ -211,6 +216,8 @@ public class Tool {
             currentDirection = currentDirection + anglesLater.get(i) - 180*60*60;
             if (currentDirection < 0)
                 currentDirection += 360*60*60;
+            if (currentDirection > 360*60*60)
+                currentDirection -= 360*60*60;
             anglesInDirection.add(currentDirection);
         }
     }
@@ -221,7 +228,7 @@ public class Tool {
     private void step3() {
         int num = anglesInDirection.size();
         for (int i = 0; i < num; i++) {
-            double sitar = ((double)anglesInDirection.get(i))/(180*60*60d); //此处整数除法，舍去了尾数,进行强制类型转换
+            double sitar = ((double)anglesInDirection.get(i))*Math.PI/(180*60*60d); //此处整数除法，舍去了尾数,进行强制类型转换
             double deltaX = lengths.get(i)*Math.cos(sitar);
             double deltaY = lengths.get(i)*Math.sin(sitar);
             addXY.add(new PXY(deltaX,deltaY));
@@ -243,7 +250,9 @@ public class Tool {
         }
 
 
-        errorForLength = Math.sqrt(deltaPlusDeltaX*deltaPlusDeltaX + deltaPlusDeltaY*deltaPlusDeltaY)/plusLength;
+        errorForLength = Math.sqrt(deltaPlusDeltaX*deltaPlusDeltaX+deltaPlusDeltaY*deltaPlusDeltaY)/plusLength;
+        deltaXForAll = deltaPlusDeltaX;
+        deltaYForAll = deltaPlusDeltaY;
 
         for (int i = 0; i < num; i++) {
             double laterDeltaX = addXY.get(i).getX() - deltaPlusDeltaX*lengths.get(i)/plusLength;
@@ -276,17 +285,27 @@ public class Tool {
 
         int num = anglesLater.size();
         List<String> results = new ArrayList<>();
+
+        results.add(String.format("%-12s","内角改正值")+String.format("%-15s","方位角")+String.format("%-40s","增量计算值")+String.format("%-40s","增量改正值")+String.format("%-40s","坐标"));
+
         for (int i =0; i < num; i++) {
             String sToWrite = changeToFormat(anglesLater.get(i),anglesInDirection.get(i),addXY.get(i),addXYLater.get(i),XY.get(i));
             results.add(sToWrite);
         }
 
-        results.add("闭合差: "+Integer.toString(errorByPlusAngle));
-        results.add("导线全长相对闭合差： "+Double.toString(errorForLength));
+        results.add("闭合差: "+Integer.toString(errorByPlusAngle)+"\"(限差：31\")");
+
+        results.add("x增量和："+Double.toString(deltaXForAll)+"m  y增量和："+Double.toString(deltaYForAll)+"m");
+
+        int errorForLengthToFormat = (int)((1.0*Math.pow(10,10))/(errorForLength*Math.pow(10,10)));
+
+        results.add("导线全长相对闭合差： 1/"+Integer.toString(errorForLengthToFormat)+"(限差：1/14000)");
+
+        results.add("上述为第"+Integer.toString(numForcircle)+"圈数据平差结果");
 
         //
         try {
-            Files.write(Paths.get("/home/ubd/data/result.txt"),results);
+            Files.write(Paths.get("./result.txt"),results);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -308,9 +327,9 @@ public class Tool {
         String abc1 = String.format("%-15s",Integer.toString(a1)+" "+Integer.toString(b1)+" "+Integer.toString(c1));
         String abc2 = String.format("%-15s",Integer.toString(a2)+" "+Integer.toString(b2)+" "+Integer.toString(c2));
         //
-        String s1 = String.format("%-40s",Double.toString(deltaXY.getX())+","+Double.toString(deltaXY.getY()));
-        String s2 = String.format("%-40s",Double.toString(deltaXYLater.getX())+","+Double.toString(deltaXYLater.getY()));
-        String s3 = String.format("%-40s",Double.toString(xy.getX())+","+Double.toString(xy.getY()));
+        String s1 = String.format("%-45s",Double.toString(deltaXY.getX())+","+Double.toString(deltaXY.getY()));
+        String s2 = String.format("%-45s",Double.toString(deltaXYLater.getX())+","+Double.toString(deltaXYLater.getY()));
+        String s3 = String.format("%-45s",Double.toString(xy.getX())+","+Double.toString(xy.getY()));
         //
         return abc1+abc2+s1+s2+s3;
     }
