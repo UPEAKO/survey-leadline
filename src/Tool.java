@@ -305,7 +305,7 @@ public class Tool {
 
         //
         try {
-            Files.write(Paths.get("./result.txt"),results);
+            Files.write(Paths.get("./resultFor"+fileName.substring(2)),results);
         } catch (IOException e) {
             e.printStackTrace();
         }
