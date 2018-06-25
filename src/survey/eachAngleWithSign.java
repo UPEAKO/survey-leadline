@@ -1,3 +1,6 @@
+package survey;
+
+@SuppressWarnings("WeakerAccess")
 public class eachAngleWithSign {
     Integer angle;
     int sign;

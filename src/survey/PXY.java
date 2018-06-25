@@ -1,3 +1,6 @@
+package survey;
+
+@SuppressWarnings("WeakerAccess")
 public class PXY {
     private double x,y;
     public PXY(double x,double y) {

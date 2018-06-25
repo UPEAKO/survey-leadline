@@ -1,3 +1,5 @@
+package survey;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -13,6 +15,7 @@ import java.util.List;
  * 初始坐标
  * 角，边
  */
+@SuppressWarnings("WeakerAccess")
 public class Tool {
     private String fileName;
     //初始方位角
@@ -166,12 +169,12 @@ public class Tool {
         int errorAngel = angleAll - 180*60*60*(angles.size()-2);
         errorByPlusAngle = errorAngel;
 
-        List<eachAngleWithSign> anglesCopy = new ArrayList<>();
-        anglesCopy.addAll(angles);
+        List<eachAngleWithSign> anglesCopy = new ArrayList<>(angles);
+        //anglesCopy.addAll(angles);
 
         //暂时这样
-        for (int i = 0; i < anglesCopy.size(); i++) {
-            for (int j = 0; j < anglesCopy.size() - 1; j++) {
+        for (int i = 0; i < anglesCopy.size() - 1; i++) {
+            for (int j = 0; j < anglesCopy.size() - 1 - i; j++) {
                 eachAngleWithSign temp = new eachAngleWithSign(0, 0);
                 if (anglesCopy.get(j).angle < anglesCopy.get(j+1).angle) {
                     temp.set(anglesCopy.get(j));
