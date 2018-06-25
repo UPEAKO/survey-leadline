@@ -51,7 +51,7 @@ public class Test_InputStreamReader {
             //DataOutputStream can't set charsetName
             //OutputStream outputStream1 = new DataOutputStream(outputStream);
             //charsetName utf-8 should be put in "" instead of ''
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream,"utf-8");
             int c;
             while ((c = inputStreamReader.read()) != -1) {
                 outputStreamWriter.append((char) c);
